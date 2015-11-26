@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS `haproxy` (
   `ip_address` int(10) unsigned NOT NULL,
   `port` smallint(5) unsigned NOT NULL,
   `backend_name` varchar(50) NOT NULL,
+  `protocol` varchar(10) NOT NULL,
+  `balance` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `host` (`host_id`),
   CONSTRAINT `haproxy_ibfk_1` FOREIGN KEY (`host_id`) REFERENCES `host` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
