@@ -1,8 +1,8 @@
--- MySQL dump 10.14  Distrib 5.5.44-MariaDB, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.46, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: cherry
 -- ------------------------------------------------------
--- Server version	5.5.44-MariaDB-1ubuntu0.14.04.1
+-- Server version	5.5.46-0ubuntu0.14.04.2
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -27,6 +27,42 @@ CREATE TABLE IF NOT EXISTS `acl` (
   `mask` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `acl` (`network`,`mask`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `backend`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `backend` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `haproxy_id` bigint(20) unsigned NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `ip_address` int(10) unsigned NOT NULL,
+  `port` smallint(5) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `haproxy` (`haproxy_id`),
+  CONSTRAINT `backend_ibfk_1` FOREIGN KEY (`haproxy_id`) REFERENCES `haproxy` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `haproxy`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `haproxy` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `host_id` bigint(20) unsigned NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `ip_address` int(10) unsigned NOT NULL,
+  `port` smallint(5) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `host` (`host_id`),
+  CONSTRAINT `haproxy_ibfk_1` FOREIGN KEY (`host_id`) REFERENCES `host` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -248,4 +284,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-09-09 15:27:02
+-- Dump completed on 2015-11-26 19:12:35
