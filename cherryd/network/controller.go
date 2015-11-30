@@ -766,8 +766,7 @@ func (r *Controller) toggleVIP(w rest.ResponseWriter, req *rest.Request) {
 	w.WriteJson(&struct{}{})
 }
 
-type HAProxyParam struct {
-	HostIP      uint64    `json:"host_id"`
+type HAProxy struct {
 	Name        string    `json:"name"`
 	IPAddress   string    `json:"ip_address"`
 	Port        uint16    `json:"port"`
@@ -777,9 +776,14 @@ type HAProxyParam struct {
 	Balance     string    `json:"balance"`
 }
 
-type HAProxy struct {
+type HAProxyParam struct {
+	HostIP uint64 `json:"host_id"`
+	HAProxy
+}
+
+type HAProxyResp struct {
 	ID uint64 `json:id`
-	HAProxyParam
+	HAProxy
 }
 
 type Backend struct {
