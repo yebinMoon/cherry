@@ -1262,3 +1262,28 @@ func (r *MySQL) HAProxy(hostID uint64) (ha network.HAProxyResp, err error) {
 
 	return ha, nil
 }
+
+func (r *MySQL) Backends(haproxyID uint64) (be []network.Backend, err error) {
+	f := func(db *sql.DB) error {
+		rows, err := db.Query("SELECT id, name, ip_address, port FROM backend WHERE haproxy_id = ?", haproxyID)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		if !rows.Next() {
+			v := network.Backend{}
+			if err := rows.Scan(&v.ID, &v.Name, &v.IPAddress, &v.Port); err != nil {
+				return err
+			}
+			be = append(be, v)
+		}
+
+		return rows.Err()
+	}
+	if err = r.query(f); err != nil {
+		return nil, err
+	}
+
+	return be, nil
+}
