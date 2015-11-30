@@ -125,6 +125,7 @@ func (r *Controller) serveREST(conf *goconf.ConfigFile) {
 		rest.Delete("/api/v1/vip/:id", r.removeVIP),
 		rest.Options("/api/v1/vip/:id", r.allowOrigin),
 		rest.Put("/api/v1/vip/:id", r.toggleVIP),
+		rest.Get("/api/v1/haproxy/:hostID", r.listHAProxy),
 	)
 	if err != nil {
 		r.log.Err(fmt.Sprintf("Controller: making a REST router: %v", err))
@@ -786,6 +787,18 @@ type Backend struct {
 	Name      string `json:"name"`
 	IPAddress string `json:"ip_address"`
 	Port      uint16 `json:"port"`
+}
+
+func (r *Controller) listHAProxy(w rest.ResponseWriter, req *rest.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	hostID, err := strconv.ParseUint(req.PathParam("hostID"), 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	fmt.Printf("host id: %v\n", hostID)
 }
 
 func writeError(w rest.ResponseWriter, status int, err error) {
