@@ -56,6 +56,7 @@ type database interface {
 	SwitchPorts(switchID uint64) ([]SwitchPort, error)
 	ToggleVIP(id uint64) (net.IP, net.HardwareAddr, error)
 	VIPs() ([]VIP, error)
+	HAProxy(hostID uint64) (HAProxyResp, error)
 }
 
 type EventListener interface {
@@ -803,6 +804,17 @@ func (r *Controller) listHAProxy(w rest.ResponseWriter, req *rest.Request) {
 	}
 
 	fmt.Printf("host id: %v\n", hostID)
+
+	ha, err := r.db.HAProxy(hostID)
+	if err != nil {
+		fmt.Printf("Controller: REST: failed to query database: %v", err)
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	w.WriteJson(struct {
+		HAProxyCopf HAProxyResp `json:"haproxy"`
+	}{ha})
 }
 
 func writeError(w rest.ResponseWriter, status int, err error) {
