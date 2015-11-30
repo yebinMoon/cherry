@@ -1238,3 +1238,27 @@ func (r *MySQL) RemoveVIP(id uint64) (ok bool, err error) {
 
 	return ok, nil
 }
+
+func (r *MySQL) HAProxy(hostID uint64) (ha network.HAProxyResp, err error) {
+	f := func(db *sql.DB) error {
+		row, err := db.Query("SELECT id, name, ip_address, port, backend_name, protocol, balance FROM haproxy WHERE host_id = ?", hostID)
+		if err != nil {
+			return err
+		}
+		defer row.Close()
+
+		if !row.Next() {
+			return nil
+		}
+		if err := row.Scan(&ha.ID, &ha.Name, &ha.IPAddress, &ha.Port, &ha.BackendName, &ha.Protocol, &ha.Balance); err != nil {
+			return err
+		}
+
+		return nil
+	}
+	if err = r.query(f); err != nil {
+		return network.HAProxyResp{}, err
+	}
+
+	return ha, nil
+}
