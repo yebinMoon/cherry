@@ -1241,7 +1241,7 @@ func (r *MySQL) RemoveVIP(id uint64) (ok bool, err error) {
 
 func (r *MySQL) HAProxy(hostID uint64) (ha network.HAProxyResp, err error) {
 	f := func(db *sql.DB) error {
-		row, err := db.Query("SELECT id, name, ip_address, port, backend_name, protocol, balance FROM haproxy WHERE host_id = ?", hostID)
+		row, err := db.Query("SELECT id, name, INET_NTOA(ip_address), port, backend_name, protocol, balance FROM haproxy WHERE host_id = ?", hostID)
 		if err != nil {
 			return err
 		}
@@ -1265,7 +1265,7 @@ func (r *MySQL) HAProxy(hostID uint64) (ha network.HAProxyResp, err error) {
 
 func (r *MySQL) Backends(haproxyID uint64) (be []network.Backend, err error) {
 	f := func(db *sql.DB) error {
-		rows, err := db.Query("SELECT id, name, ip_address, port FROM backend WHERE haproxy_id = ?", haproxyID)
+		rows, err := db.Query("SELECT id, name, INET_NTOA(ip_address), port FROM backend WHERE haproxy_id = ?", haproxyID)
 		if err != nil {
 			return err
 		}
