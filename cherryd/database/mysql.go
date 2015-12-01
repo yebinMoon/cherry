@@ -1271,7 +1271,7 @@ func (r *MySQL) Backends(haproxyID uint64) (be []network.Backend, err error) {
 		}
 		defer rows.Close()
 
-		if !rows.Next() {
+		if rows.Next() {
 			v := network.Backend{}
 			if err := rows.Scan(&v.ID, &v.Name, &v.IPAddress, &v.Port); err != nil {
 				return err
