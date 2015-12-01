@@ -43,7 +43,6 @@ CREATE TABLE IF NOT EXISTS `backend` (
   `ip_address` int(10) unsigned NOT NULL,
   `port` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `haproxy` (`haproxy_id`),
   CONSTRAINT `backend_ibfk_1` FOREIGN KEY (`haproxy_id`) REFERENCES `haproxy` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
