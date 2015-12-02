@@ -1327,11 +1327,11 @@ func (r *MySQL) UpdateHAProxy(vipID uint64, ha network.HAProxyParam) error {
 		}
 		defer tx.Rollback()
 
-		haproxyID, err := r.updateHAProxy(tx, vipID, ha)
+		haproxyID, err := updateHAProxy(tx, vipID, ha)
 		if err != nil {
 			return err
 		}
-		if err := r.updateBackends(tx, haproxyID, ha.Backends); err != nil {
+		if err := updateBackends(tx, haproxyID, ha.Backends); err != nil {
 			return err
 		}
 
@@ -1348,7 +1348,7 @@ func (r *MySQL) UpdateHAProxy(vipID uint64, ha network.HAProxyParam) error {
 	return nil
 }
 
-func (r *MySQL) updateHAProxy(tx *sql.Tx, vipID uint64, ha network.HAProxyParam) (haproxyID uint64, err error) {
+func updateHAProxy(tx *sql.Tx, vipID uint64, ha network.HAProxyParam) (haproxyID uint64, err error) {
 	qry := "UPDATE haproxy set name = (?), ip_address = INET_ATON(?), port = (?), backend_name = (?), protocol = (?), balance = (?)"
 	result, err := tx.Exec(qry, ha.Name, ha.IPAddress, ha.Port, ha.BackendName, ha.Protocol, ha.Balance)
 	if err != nil {
@@ -1362,7 +1362,7 @@ func (r *MySQL) updateHAProxy(tx *sql.Tx, vipID uint64, ha network.HAProxyParam)
 	return uint64(id), nil
 }
 
-func (r *MySQL) updateBackends(tx *sql.Tx, haID uint64, be []network.Backend) error {
+func updateBackends(tx *sql.Tx, haID uint64, be []network.Backend) error {
 	stmt, err := tx.Prepare("UPDATE backend set name = (?), ip_address = INET_ATON(?), port = (?) WHERE haproxy_id = (?)")
 	if err != nil {
 		return err
