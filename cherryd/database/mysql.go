@@ -1239,9 +1239,9 @@ func (r *MySQL) RemoveVIP(id uint64) (ok bool, err error) {
 	return ok, nil
 }
 
-func (r *MySQL) HAProxy(hostID uint64) (ha network.HAProxyResp, err error) {
+func (r *MySQL) HAProxy(vipID uint64) (ha network.HAProxyResp, err error) {
 	f := func(db *sql.DB) error {
-		row, err := db.Query("SELECT id, name, INET_NTOA(ip_address), port, backend_name, protocol, balance FROM haproxy WHERE host_id = ?", hostID)
+		row, err := db.Query("SELECT id, name, INET_NTOA(ip_address), port, backend_name, protocol, balance FROM haproxy WHERE vip_id = ?", vipID)
 		if err != nil {
 			return err
 		}

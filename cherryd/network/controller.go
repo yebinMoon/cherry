@@ -56,7 +56,7 @@ type database interface {
 	SwitchPorts(switchID uint64) ([]SwitchPort, error)
 	ToggleVIP(id uint64) (net.IP, net.HardwareAddr, error)
 	VIPs() ([]VIP, error)
-	HAProxy(hostID uint64) (HAProxyResp, error)
+	HAProxy(vipID uint64) (HAProxyResp, error)
 	Backends(haproxyID uint64) ([]Backend, error)
 }
 
@@ -127,7 +127,7 @@ func (r *Controller) serveREST(conf *goconf.ConfigFile) {
 		rest.Delete("/api/v1/vip/:id", r.removeVIP),
 		rest.Options("/api/v1/vip/:id", r.allowOrigin),
 		rest.Put("/api/v1/vip/:id", r.toggleVIP),
-		rest.Get("/api/v1/haproxy/:hostID", r.listHAProxy),
+		rest.Get("/api/v1/haproxy/:vipID", r.listHAProxy),
 	)
 	if err != nil {
 		r.log.Err(fmt.Sprintf("Controller: making a REST router: %v", err))
@@ -779,7 +779,7 @@ type HAProxy struct {
 }
 
 type HAProxyParam struct {
-	HostIP uint64 `json:"host_id"`
+	VIPID uint64 `json:"vip_id"`
 	HAProxy
 }
 
@@ -798,13 +798,13 @@ type Backend struct {
 func (r *Controller) listHAProxy(w rest.ResponseWriter, req *rest.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	hostID, err := strconv.ParseUint(req.PathParam("hostID"), 10, 64)
+	vipID, err := strconv.ParseUint(req.PathParam("vipID"), 10, 64)
 	if err != nil {
 		writeError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	ha, err := r.db.HAProxy(hostID)
+	ha, err := r.db.HAProxy(vipID)
 	if err != nil {
 		fmt.Printf("Controller: REST: failed to query database: %v", err)
 		writeError(w, http.StatusInternalServerError, err)
