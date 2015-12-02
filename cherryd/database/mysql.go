@@ -1332,3 +1332,19 @@ func (r *MySQL) updateHAProxy(tx *sql.Tx, vipID uint64, ha network.HAProxyParam)
 
 	return uint64(id), nil
 }
+
+func (r *MySQL) updateBackends(tx *sql.Tx, haID uint64, be []network.Backend) error {
+	stmt, err := tx.Prepare("UPDATE backend set name = (?), ip_address = INET_ATON(?), port = (?)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for i := 0; i < len(be); i++ {
+		if _, err := stmt.Exec(be[i].Name, be[i].IPAddress, be[i].Port); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
