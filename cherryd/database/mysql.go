@@ -1334,14 +1334,14 @@ func (r *MySQL) updateHAProxy(tx *sql.Tx, vipID uint64, ha network.HAProxyParam)
 }
 
 func (r *MySQL) updateBackends(tx *sql.Tx, haID uint64, be []network.Backend) error {
-	stmt, err := tx.Prepare("UPDATE backend set name = (?), ip_address = INET_ATON(?), port = (?)")
+	stmt, err := tx.Prepare("UPDATE backend set name = (?), ip_address = INET_ATON(?), port = (?) WHERE haproxy_id = (?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
 	for i := 0; i < len(be); i++ {
-		if _, err := stmt.Exec(be[i].Name, be[i].IPAddress, be[i].Port); err != nil {
+		if _, err := stmt.Exec(be[i].Name, be[i].IPAddress, be[i].Port, haID); err != nil {
 			return err
 		}
 	}
