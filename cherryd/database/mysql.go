@@ -1319,6 +1319,35 @@ func (r *MySQL) VIPAddrs(vipID uint64) (active_host_ip string, standby_host_ip s
 	return active_host_ip, standby_host_ip, nil
 }
 
+func (r *MySQL) UpdateHAProxy(vipID uint64, ha network.HAProxyParam) error {
+	f := func(db *sql.DB) error {
+		tx, err := db.Begin()
+		if err != nil {
+			return err
+		}
+		defer tx.Rollback()
+
+		haproxyID, err := r.updateHAProxy(tx, vipID, ha)
+		if err != nil {
+			return err
+		}
+		if err := r.updateBackends(tx, haproxyID, ha.Backends); err != nil {
+			return err
+		}
+
+		if err := tx.Commit(); err != nil {
+			return err
+		}
+
+		return nil
+	}
+	if err := r.query(f); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *MySQL) updateHAProxy(tx *sql.Tx, vipID uint64, ha network.HAProxyParam) (haproxyID uint64, err error) {
 	qry := "UPDATE haproxy set name = (?), ip_address = INET_ATON(?), port = (?), backend_name = (?), protocol = (?), balance = (?)"
 	result, err := tx.Exec(qry, ha.Name, ha.IPAddress, ha.Port, ha.BackendName, ha.Protocol, ha.Balance)
