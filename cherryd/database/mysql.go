@@ -1318,3 +1318,13 @@ func (r *MySQL) VIPAddrs(vipID uint64) (active_host_ip string, standby_host_ip s
 
 	return active_host_ip, standby_host_ip, nil
 }
+
+func (r *MySQL) updateHAProxy(tx *sql.Tx, vipID uint64, ha network.HAProxyParam) error {
+	qry := "UPDATE haproxy set name = (?), ip_address = INET_ATON(?), port = (?), backend_name = (?), protocol = (?), balance = (?)"
+	_, err := tx.Exec(qry, ha.Name, ha.IPAddress, ha.Port, ha.BackendName, ha.Protocol, ha.Balance)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
