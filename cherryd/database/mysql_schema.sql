@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `backend` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `haproxy` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `host_id` bigint(20) unsigned NOT NULL,
+  `vip_id` bigint(20) unsigned NOT NULL,
   `name` varchar(50) NOT NULL,
   `ip_address` int(10) unsigned NOT NULL,
   `port` smallint(5) unsigned NOT NULL,
@@ -63,8 +63,8 @@ CREATE TABLE IF NOT EXISTS `haproxy` (
   `protocol` varchar(10) NOT NULL,
   `balance` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `host` (`host_id`),
-  CONSTRAINT `haproxy_ibfk_1` FOREIGN KEY (`host_id`) REFERENCES `host` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+  UNIQUE KEY `vip` (`vip_id`),
+  CONSTRAINT `haproxy_ibfk_1` FOREIGN KEY (`vip_id`) REFERENCES `vip` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
