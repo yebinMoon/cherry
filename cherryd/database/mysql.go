@@ -1287,3 +1287,34 @@ func (r *MySQL) Backends(haproxyID uint64) (be []network.Backend, err error) {
 
 	return be, nil
 }
+
+func (r *MySQL) VIPAddrs(vipID uint64) (active_host_ip string, standby_host_ip string, err error) {
+	f := func(db *sql.DB) error {
+		qry := `SELECT INET_NTOA(C.address), INET_NTOA(E.address)
+			FROM vip A
+			JOIN host B ON A.active_host_id = B.id
+			JOIN ip C ON B.ip_id = C.id
+			JOIN host D ON A.standby_host_id = D.id
+			JOIN ip E ON D.ip_id = E.id
+			WHERE A.id = (?)`
+		row, err := db.Query(qry, vipID)
+		if err != nil {
+			return err
+		}
+		defer row.Close()
+
+		if !row.Next() {
+			return fmt.Errorf("unknown VIP hosts (ID=%v)", vipID)
+		}
+		if err := row.Scan(&active_host_ip, &standby_host_ip); err != nil {
+			return err
+		}
+
+		return nil
+	}
+	if err = r.query(f); err != nil {
+		return "", "", err
+	}
+
+	return active_host_ip, standby_host_ip, nil
+}
