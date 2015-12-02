@@ -58,6 +58,7 @@ type database interface {
 	VIPs() ([]VIP, error)
 	HAProxy(vipID uint64) (HAProxyResp, error)
 	Backends(haproxyID uint64) ([]Backend, error)
+	VIPAddrs(vipID uint64) (string, string, error)
 }
 
 type EventListener interface {
@@ -835,7 +836,14 @@ func (r *Controller) remoteHAProxy(w rest.ResponseWriter, req *rest.Request) {
 		return
 	}
 
-	fmt.Printf("vipID: %v\n", vipID)
+	active_host_ip, standby_host_ip, err := r.db.VIPAddrs(vipID)
+	if err != nil {
+		fmt.Printf("Controller: REST: failed to query database: %v", err)
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	fmt.Printf("vipID: %v\nactive_host_ip: %v\nstandby_host_ip: %v\n", vipID, active_host_ip, standby_host_ip)
 }
 
 func writeError(w rest.ResponseWriter, status int, err error) {
